@@ -1,114 +1,131 @@
 <template>
-  <v-container ref="CAContainer" fluid>
-    <v-card dark color="rgb(0,0,0,0.2)">
-      <v-card-title>Narrative Controls</v-card-title>
-      <v-container fluid>
-        <v-row no-gutters>
-          <v-col>
-            <v-subheader class="ma-0 pa-0"
-              >Totally new narrative chance</v-subheader
-            >
-            <v-slider
-              v-on="on"
-              min="0"
-              max="0.05"
-              step="0.00001"
-              v-model="newNarrativeChance"
-              thumb-label
-            ></v-slider>
-          </v-col>
-          <v-col>
-            <v-subheader class="ma-0 pa-0">Momentum loss</v-subheader>
-            <v-slider
-              min="0"
-              max="1"
-              step="0.00001"
-              v-model="healingRate"
-              thumb-label
-            ></v-slider>
-          </v-col>
-          <v-col>
-            <v-subheader class="ma-0 pa-0"
-              >Chance to integrate other narratives</v-subheader
-            >
-            <v-slider
-              min="0"
-              max="1"
-              step="0.0001"
-              v-model="chanceToMix"
-              thumb-label
-            ></v-slider>
-          </v-col>
-        </v-row>
-        <v-row>
-          <v-col>
-            <v-subheader class="ma-0 pa-0">Mutation chance</v-subheader>
-            <v-slider
-              min="0"
-              max="1"
-              step="0.0001"
-              v-model="mutationChance"
-              thumb-label
-            ></v-slider>
-          </v-col>
-          <v-col>
-            <v-subheader class="ma-0 pa-0">Mutation strength</v-subheader>
-            <v-slider
-              min="0"
-              max="255"
-              step="1"
-              v-model="mutationStrength"
-              thumb-label
-            ></v-slider>
-          </v-col>
-          <v-col>
-            <v-subheader class="ma-0 pa-0">Super spreader chance</v-subheader>
-            <v-slider
-              min="0"
-              max="0.1"
-              step="0.0001"
-              v-model="superSpreaderChance"
-              thumb-label
-            ></v-slider>
-          </v-col>
-          <v-col>
-            <v-subheader class="ma-0 pa-0">Super spreader strength</v-subheader>
-            <v-slider
-              min="0"
-              max="10"
-              step="0.1"
-              v-model="superSpreaderStrength"
-              thumb-label
-            ></v-slider>
-          </v-col>
-        </v-row>
-        <v-row>
-          <v-card-actions>
-            <v-btn
-              v-model="wrap"
-              :color="wrap ? 'secondary' : 'primary'"
-              value="false"
-              @click="wrap = !wrap"
-              hide-details
-              >Torus</v-btn
-            >
-            <v-btn color="primary" :disabled="isRunning" @click="step"
-              >Single step</v-btn
-            >
-            <v-btn
-              v-model="isRunning"
-              :color="isRunning ? 'secondary' : 'primary'"
-              @click="run"
-              >run</v-btn
-            >
-            <v-btn color="primary" @click="reset">reset</v-btn>
-          </v-card-actions>
-        </v-row>
-      </v-container>
-    </v-card>
+  <div style="position: relative">
+    <canvas ref="myCanvas" id="myCanvas"
+      >Browser too old. Please update or use a different browser.</canvas
+    >
 
-    <canvas ref="myCanvas" id="myCanvas"></canvas>
-  </v-container>
+    <v-menu
+      v-model="active_menu"
+      :close-on-content-click="false"
+      :nudge-width="200"
+      offset-y
+    >
+      <template v-slot:activator="{ on }">
+        <v-hover>
+          <v-chip
+            slot-scope="{ hover }"
+            :class="`elevation-${hover ? 5 : 2}`"
+            style="position:absolute; top:10px; left:10px"
+            v-ripple
+            color="primary"
+            text-color="white"
+            v-on="on"
+          >
+            <v-avatar> <v-icon>mdi-settings</v-icon> </v-avatar>Settings
+          </v-chip>
+        </v-hover>
+      </template>
+
+      <v-card dark color="rgb(0,0,0,0.5)">
+        <v-card-title>Narrative Controls</v-card-title>
+        <v-container fluid>
+          <v-row no-gutters>
+            <v-col>
+              <v-subheader class="ma-0 pa-0"
+                >Unconventional thinkers</v-subheader
+              >
+              <v-slider
+                min="0"
+                max="0.05"
+                step="0.00001"
+                v-model="newNarrativeChance"
+              ></v-slider>
+            </v-col>
+            <v-col>
+              <v-subheader class="ma-0 pa-0">New idea skepticism</v-subheader>
+              <v-slider
+                min="0"
+                max="1"
+                step="0.00001"
+                v-model="healingRate"
+              ></v-slider>
+            </v-col>
+            <v-col>
+              <v-subheader class="ma-0 pa-0">Pluralism</v-subheader>
+              <v-slider
+                min="0"
+                max="1"
+                step="0.0001"
+                v-model="chanceToMix"
+              ></v-slider>
+            </v-col>
+          </v-row>
+          <v-row>
+            <v-col>
+              <v-subheader class="ma-0 pa-0">Evolution chance</v-subheader>
+              <v-slider
+                min="0"
+                max="1"
+                step="0.0001"
+                v-model="mutationChance"
+              ></v-slider>
+            </v-col>
+            <v-col>
+              <v-subheader class="ma-0 pa-0">Evolution strength</v-subheader>
+              <v-slider
+                min="0"
+                max="255"
+                step="1"
+                v-model="mutationStrength"
+              ></v-slider>
+            </v-col>
+            <v-col>
+              <v-subheader class="ma-0 pa-0">Radicalization chance</v-subheader>
+              <v-slider
+                min="0"
+                max="0.1"
+                step="0.0001"
+                v-model="superSpreaderChance"
+              ></v-slider>
+            </v-col>
+            <v-col>
+              <v-subheader class="ma-0 pa-0"
+                >Radicalization strength</v-subheader
+              >
+              <v-slider
+                min="0"
+                max="10"
+                step="0.1"
+                v-model="superSpreaderStrength"
+              ></v-slider>
+            </v-col>
+          </v-row>
+          <v-row>
+            <v-card-actions>
+              <v-btn
+                v-model="wrap"
+                :color="wrap ? 'secondary' : 'primary'"
+                value="false"
+                @click="wrap = !wrap"
+                hide-details
+                >Torus</v-btn
+              >
+              <v-btn color="primary" :disabled="isRunning" @click="step"
+                >Single step</v-btn
+              >
+              <v-btn
+                v-model="isRunning"
+                :color="isRunning ? 'secondary' : 'primary'"
+                @click="run"
+                >run</v-btn
+              >
+              <v-btn color="primary" @click="reset">reset</v-btn>
+            </v-card-actions>
+          </v-row>
+        </v-container>
+      </v-card>
+    </v-menu>
+  </div>
 </template>
 
 <script>
@@ -125,11 +142,13 @@ export default {
     superSpreaderStrength: 1,
     wrap: false,
     isRunning: false,
+    active_menu: true,
     cellSize: 10
   }),
 
   mounted: function() {
     this.reset();
+    this.run();
   },
   watch: {
     wrap() {
@@ -170,9 +189,8 @@ export default {
     },
     init() {
       const world = new CAWorld({
-        width:
-          Math.floor(this.$refs.CAContainer.clientWidth / this.cellSize) - 2,
-        height: Math.floor(1000 / this.cellSize),
+        width: Math.ceil(window.innerWidth / this.cellSize),
+        height: Math.ceil(window.innerHeight / this.cellSize),
         cellSize: this.cellSize,
         wrap: false
       });

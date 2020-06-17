@@ -4,6 +4,9 @@ module.exports = {
     msTileColor: "#FFFFFF",
     manifestOptions: {
       background_color: "#FFFFFF"
+    },
+    workboxOptions: {
+      skipWaiting: true
     }
   }
 };
