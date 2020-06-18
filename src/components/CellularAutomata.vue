@@ -1,5 +1,5 @@
 <template>
-  <div style="position: relative">
+  <div v-resize="onResize" style="position: relative">
     <canvas ref="myCanvas" id="myCanvas"
       >Browser too old. Please update or use a different browser.</canvas
     >
@@ -27,13 +27,17 @@
       </template>
 
       <v-card dark color="rgb(0,0,0,0.5)">
-        <v-card-title>Narrative Controls</v-card-title>
-        <v-container fluid>
+        <v-card-title
+          style="padding-left: 2%; padding-right: 2%; padding-bottom: 1%; padding-top: 4%"
+          >Narrative Controls</v-card-title
+        >
+        <v-container
+          style="padding-left: 2%; padding-right: 2%; padding-top: 0%"
+          fluid
+        >
           <v-row no-gutters>
             <v-col>
-              <v-subheader class="ma-0 pa-0"
-                >Unconventional thinkers</v-subheader
-              >
+              <v-subheader class="ma-0 pa-0">Wild thinkers</v-subheader>
               <v-slider
                 min="0"
                 max="0.05"
@@ -42,7 +46,7 @@
               ></v-slider>
             </v-col>
             <v-col>
-              <v-subheader class="ma-0 pa-0">New idea skepticism</v-subheader>
+              <v-subheader class="ma-0 pa-0">Skepticism</v-subheader>
               <v-slider
                 min="0"
                 max="1"
@@ -60,7 +64,7 @@
               ></v-slider>
             </v-col>
           </v-row>
-          <v-row>
+          <v-row no-gutters>
             <v-col>
               <v-subheader class="ma-0 pa-0">Evolution chance</v-subheader>
               <v-slider
@@ -80,7 +84,7 @@
               ></v-slider>
             </v-col>
             <v-col>
-              <v-subheader class="ma-0 pa-0">Radicalization chance</v-subheader>
+              <v-subheader class="ma-0 pa-0">Influencer</v-subheader>
               <v-slider
                 min="0"
                 max="0.1"
@@ -88,19 +92,8 @@
                 v-model="superSpreaderChance"
               ></v-slider>
             </v-col>
-            <v-col>
-              <v-subheader class="ma-0 pa-0"
-                >Radicalization strength</v-subheader
-              >
-              <v-slider
-                min="0"
-                max="10"
-                step="0.1"
-                v-model="superSpreaderStrength"
-              ></v-slider>
-            </v-col>
           </v-row>
-          <v-row>
+          <v-row no-gutters>
             <v-card-actions>
               <v-btn
                 v-model="wrap"
@@ -108,18 +101,23 @@
                 value="false"
                 @click="wrap = !wrap"
                 hide-details
-                >Torus</v-btn
+                ><v-icon>mdi-chart-donut</v-icon>Torus</v-btn
               >
-              <v-btn color="primary" :disabled="isRunning" @click="step"
-                >Single step</v-btn
-              >
+              <!-- <v-btn
+                color="primary"
+                v-if="isMobileDevice === false"
+                :disabled="isRunning"
+                @click="step"
+              >Single step</v-btn> -->
               <v-btn
                 v-model="isRunning"
                 :color="isRunning ? 'secondary' : 'primary'"
-                @click="run"
-                >run</v-btn
+                @click="toggleRun"
+                ><v-icon>mdi-play</v-icon>run</v-btn
               >
-              <v-btn color="primary" @click="reset">reset</v-btn>
+              <v-btn color="primary" @click="reset">
+                <v-icon>mdi-rewind</v-icon> reset</v-btn
+              >
             </v-card-actions>
           </v-row>
         </v-container>
@@ -140,14 +138,18 @@ export default {
     chanceToMix: 0.001,
     superSpreaderChance: 0.0001,
     superSpreaderStrength: 1,
+    cellSize: 10,
     wrap: false,
     isRunning: false,
     active_menu: true,
-    cellSize: 10
+    innerHeight: window.innerHeight,
+    innerWidth: window.innerWidth,
+    _debounceTimer: null
   }),
 
   mounted: function() {
     this.reset();
+    this.stop();
     this.run();
   },
   watch: {
@@ -177,6 +179,21 @@ export default {
     }
   },
   methods: {
+    onResize() {
+      if (
+        this.innerHeight !== window.innerHeight ||
+        this.innerWidth !== window.innerWidth
+      ) {
+        clearTimeout(this._debounceTimer);
+        this._debounceTimer = setTimeout(() => {
+          this.reset();
+          this.stop();
+          this.run();
+        }, 500);
+        this.innerHeight = window.innerHeight;
+        this.innerWidth = window.innerWidth;
+      }
+    },
     setSettings() {
       this.CA.cellSettings = {};
       this.CA.cellSettings.newNarrativeChance = this.newNarrativeChance;
@@ -189,8 +206,8 @@ export default {
     },
     init() {
       const world = new CAWorld({
-        width: Math.ceil(window.innerWidth / this.cellSize),
-        height: Math.ceil(window.innerHeight / this.cellSize),
+        width: Math.ceil(this.innerWidth / this.cellSize),
+        height: Math.ceil(this.innerHeight / this.cellSize),
         cellSize: this.cellSize,
         wrap: false
       });
@@ -353,15 +370,17 @@ export default {
       this.CA.step();
       this.render();
     },
+    toggleRun() {
+      this.renderLoop ? this.stop() : this.run();
+    },
     run() {
-      if (this.renderLoop) {
-        clearInterval(this.renderLoop);
-        this.renderLoop = null;
-        this.isRunning = false;
-      } else {
-        this.renderLoop = setInterval(() => this.step(), 100);
-        this.isRunning = true;
-      }
+      this.renderLoop = setInterval(() => this.step(), 100);
+      this.isRunning = true;
+    },
+    stop() {
+      clearInterval(this.renderLoop);
+      this.renderLoop = null;
+      this.isRunning = false;
     },
     reset() {
       this.CA = this.init();
