@@ -33,16 +33,25 @@
         >
         <v-card-subtitle
           style="padding-left: 2%; padding-right: 2%; padding-bottom: 1%; padding-top: 4%"
+          >Simulate how narratives develop in society</v-card-subtitle
         >
-          Simulate how narratives develop in society
-        </v-card-subtitle>
         <v-container
           style="padding-left: 2%; padding-right: 2%; padding-top: 0%"
           fluid
         >
           <v-row no-gutters>
             <v-col>
-              <v-subheader class="ma-0 pa-0">Wild thinkers</v-subheader>
+              <v-tooltip bottom>
+                <template v-slot:activator="{ on, attrs }">
+                  <v-subheader v-bind="attrs" v-on="on" class="ma-0 pa-0"
+                    >Wild thinkers</v-subheader
+                  >
+                </template>
+                <span
+                  >Defines the probability with which completely new narratives
+                  are created spontaneously.</span
+                >
+              </v-tooltip>
               <v-slider
                 min="0"
                 max="0.05"
@@ -51,7 +60,17 @@
               ></v-slider>
             </v-col>
             <v-col>
-              <v-subheader class="ma-0 pa-0">Skepticism</v-subheader>
+              <v-tooltip bottom>
+                <template v-slot:activator="{ on, attrs }">
+                  <v-subheader v-bind="attrs" v-on="on" class="ma-0 pa-0"
+                    >Skepticism</v-subheader
+                  >
+                </template>
+                <span
+                  >Defines how sceptical the population is towards new
+                  narratives.</span
+                >
+              </v-tooltip>
               <v-slider
                 min="0"
                 max="1"
@@ -60,7 +79,18 @@
               ></v-slider>
             </v-col>
             <v-col>
-              <v-subheader class="ma-0 pa-0">Pluralism</v-subheader>
+              <v-tooltip bottom>
+                <template v-slot:activator="{ on, attrs }">
+                  <v-subheader v-bind="attrs" v-on="on" class="ma-0 pa-0"
+                    >Pluralism</v-subheader
+                  >
+                </template>
+                <span
+                  >Defines how open the population is towards new narratives and
+                  how much they are willing to integrate them into their world
+                  view.</span
+                >
+              </v-tooltip>
               <v-slider
                 min="0"
                 max="1"
@@ -71,7 +101,17 @@
           </v-row>
           <v-row no-gutters>
             <v-col>
-              <v-subheader class="ma-0 pa-0">Evolution chance</v-subheader>
+              <v-tooltip bottom>
+                <template v-slot:activator="{ on, attrs }">
+                  <v-subheader v-bind="attrs" v-on="on" class="ma-0 pa-0"
+                    >Evolution chance</v-subheader
+                  >
+                </template>
+                <span
+                  >Determines the probability of the narrative gradualy
+                  evolving.</span
+                >
+              </v-tooltip>
               <v-slider
                 min="0"
                 max="1"
@@ -80,7 +120,17 @@
               ></v-slider>
             </v-col>
             <v-col>
-              <v-subheader class="ma-0 pa-0">Evolution strength</v-subheader>
+              <v-tooltip bottom>
+                <template v-slot:activator="{ on, attrs }">
+                  <v-subheader v-bind="attrs" v-on="on" class="ma-0 pa-0"
+                    >Evolution strength</v-subheader
+                  >
+                </template>
+                <span
+                  >Determines the intensity of the gradual development of the
+                  narratives.</span
+                >
+              </v-tooltip>
               <v-slider
                 min="0"
                 max="255"
@@ -89,7 +139,17 @@
               ></v-slider>
             </v-col>
             <v-col>
-              <v-subheader class="ma-0 pa-0">Influencer</v-subheader>
+              <v-tooltip bottom>
+                <template v-slot:activator="{ on, attrs }">
+                  <v-subheader v-bind="attrs" v-on="on" class="ma-0 pa-0"
+                    >Influencer</v-subheader
+                  >
+                </template>
+                <span
+                  >Determines the probability that Super Spreader, highly
+                  infectious narratives, will appear.</span
+                >
+              </v-tooltip>
               <v-slider
                 min="0"
                 max="0.1"
@@ -100,21 +160,26 @@
           </v-row>
           <v-row no-gutters>
             <v-card-actions>
-              <v-btn
-                v-model="wrap"
-                :color="wrap ? 'secondary' : 'primary'"
-                value="false"
-                @click="wrap = !wrap"
-                hide-details
-              >
-                <v-icon>mdi-chart-donut</v-icon>Torus
-              </v-btn>
-              <!-- <v-btn
-                color="primary"
-                v-if="isMobileDevice === false"
-                :disabled="isRunning"
-                @click="step"
-              >Single step</v-btn>-->
+              <v-tooltip bottom>
+                <template v-slot:activator="{ on, attrs }">
+                  <v-btn
+                    v-bind="attrs"
+                    v-on="on"
+                    v-model="wrap"
+                    :color="wrap ? 'secondary' : 'primary'"
+                    value="false"
+                    @click="wrap = !wrap"
+                    hide-details
+                  >
+                    <v-icon>mdi-chart-donut</v-icon>Torus
+                  </v-btn>
+                </template>
+                <span
+                  >The world becomes a torus, up-down and left-right are
+                  smoothly connected.</span
+                >
+              </v-tooltip>
+
               <v-btn
                 v-model="isRunning"
                 :color="isRunning ? 'secondary' : 'primary'"
@@ -130,11 +195,29 @@
         </v-container>
       </v-card>
     </v-menu>
+    <v-snackbar
+      left
+      color="rgb(0,0,0,0.3)"
+      style="padding:0%; position:absolute; left:1%; bottom:2%"
+      v-model="activeHighlighted"
+      :multi-line="false"
+      :timeout="10000"
+    >
+      "{{ highlightedNarrative }}"
+    </v-snackbar>
   </div>
 </template>
 
 <script>
 import CAWorld from "../plugins/cellauto.js";
+import {
+  nounList,
+  adverbList,
+  adjectiveList,
+  prepositionList,
+  compoundWordList,
+  verbList
+} from "../plugins/arrayToSentence.js";
 
 export default {
   data: () => ({
@@ -151,7 +234,9 @@ export default {
     active_menu: true,
     innerHeight: window.innerHeight,
     innerWidth: window.innerWidth,
-    _debounceTimer: null
+    _debounceTimer: null,
+    highlightedNarrative: "Cellular Narratives",
+    activeHighlighted: false
   }),
 
   mounted: function() {
@@ -396,16 +481,62 @@ export default {
       myCanvas.width = this.CA.cellSize * this.CA.width;
       myCanvas.height = this.CA.cellSize * this.CA.height;
       this.ctx = myCanvas.getContext("2d");
+      const randSeed = Math.floor(Math.random() * 127);
+      const rect = myCanvas.getBoundingClientRect();
+      const context = this;
+      myCanvas.addEventListener(
+        "mousedown",
+        function(evt) {
+          context.activeHighlighted = true;
+          const mousePos = {
+            x: evt.clientX - rect.left,
+            y: evt.clientY - rect.top
+          };
+          const cellPos = {
+            x: Math.floor(mousePos.x / context.cellSize),
+            y: Math.floor(mousePos.y / context.cellSize)
+          };
+          //   const message =
+          //     "Mouse position: " +
+          //     mousePos.x +
+          //     "," +
+          //     mousePos.y +
+          //     "\tCell position: " +
+          //     cellPos.x +
+          //     "," +
+          //     cellPos.y;
+          //   console.log(message);
+          const type = context.CA.grid[cellPos.y][cellPos.x].type;
+          const noun = nounList[Math.floor(type[0])];
+          const adverb = adverbList[Math.floor(type[1])];
+          const adjective0 = adjectiveList[Math.floor(type[2])];
+          const adjective1 =
+            adjectiveList[Math.floor(type[2] + randSeed) % 256];
+          const verb = verbList[Math.floor(type[2])];
+          const preposition = prepositionList[Math.floor(type[0])];
+          const compoundWord = compoundWordList[Math.floor(type[1])];
 
-      //this.dbCanvas = document.createElement("canvas");
-      //this.dbCanvas.width = myCanvas.width;
-      //this.dbCanvas.height = myCanvas.height;
-      //this.dbCtx = this.dbCanvas.getContext("2d");
-
+          context.highlightedNarrative =
+            "The " +
+            adjective0 +
+            " " +
+            noun +
+            " " +
+            adverb +
+            " " +
+            verb +
+            " " +
+            preposition +
+            " " +
+            adjective1 +
+            " " +
+            compoundWord;
+        },
+        false
+      );
       this.render();
     },
     render() {
-      //this.dbCtx.clearRect(0, 0, this.dbCtx.height, this.dbCtx.width);
       this.ctx.clearRect(0, 0, this.ctx.height, this.ctx.width);
       for (let y = 0; y < this.CA.height; ++y) {
         for (let x = 0; x < this.CA.width; ++x) {
@@ -418,7 +549,6 @@ export default {
           );
         }
       }
-      //this.ctx.drawImage(this.dbCanvas, 0, 0);
     }
   }
 };
