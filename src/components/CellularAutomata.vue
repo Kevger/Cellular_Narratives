@@ -21,7 +21,7 @@
             text-color="white"
             v-on="on"
           >
-            <v-avatar> <v-icon>mdi-settings</v-icon> </v-avatar>Settings
+            <v-avatar> <v-icon>mdi-settings</v-icon> </v-avatar>Controls
           </v-chip>
         </v-hover>
       </template>
@@ -29,8 +29,13 @@
       <v-card dark color="rgb(0,0,0,0.5)">
         <v-card-title
           style="padding-left: 2%; padding-right: 2%; padding-bottom: 1%; padding-top: 4%"
-          >Narrative Controls</v-card-title
+          >Cellular Narratives</v-card-title
         >
+        <v-card-subtitle
+          style="padding-left: 2%; padding-right: 2%; padding-bottom: 1%; padding-top: 4%"
+        >
+          Simulate how narratives develop in society
+        </v-card-subtitle>
         <v-container
           style="padding-left: 2%; padding-right: 2%; padding-top: 0%"
           fluid
@@ -101,23 +106,25 @@
                 value="false"
                 @click="wrap = !wrap"
                 hide-details
-                ><v-icon>mdi-chart-donut</v-icon>Torus</v-btn
               >
+                <v-icon>mdi-chart-donut</v-icon>Torus
+              </v-btn>
               <!-- <v-btn
                 color="primary"
                 v-if="isMobileDevice === false"
                 :disabled="isRunning"
                 @click="step"
-              >Single step</v-btn> -->
+              >Single step</v-btn>-->
               <v-btn
                 v-model="isRunning"
                 :color="isRunning ? 'secondary' : 'primary'"
                 @click="toggleRun"
-                ><v-icon>mdi-play</v-icon>run</v-btn
               >
+                <v-icon>mdi-play</v-icon>run
+              </v-btn>
               <v-btn color="primary" @click="reset">
-                <v-icon>mdi-rewind</v-icon> reset</v-btn
-              >
+                <v-icon>mdi-rewind</v-icon>reset
+              </v-btn>
             </v-card-actions>
           </v-row>
         </v-container>

@@ -5,7 +5,6 @@
       <span class="mr-2">Cellular Narratives</span>
     <v-spacer/>-->
     <CellularAutomata />
-
     <v-menu left bottom>
       <template v-slot:activator="{ on, attrs }">
         <v-btn
@@ -43,28 +42,35 @@
             <v-icon>mdi-robot</v-icon>
           </v-btn>
         </v-list-item>
+        <v-list-item>
+          <v-btn text @click="explainingWhy = true">
+            <span class="mr-2">About</span>
+            <v-icon>mdi-help-circle</v-icon>
+          </v-btn>
+        </v-list-item>
       </v-list>
     </v-menu>
-    <!-- </v-app-bar> -->
 
-    <!--<v-footer color="#A234BD" dark>
-      <v-col class="text-center" cols="12">
-        {{ new Date().getFullYear() }} —
-        <strong>Future Of Making</strong>
-      </v-col>
-    </v-footer>-->
+    <v-dialog v-model="explainingWhy" fullscreen>
+      <ExplanationWhy @windowClosed="explainingWhy = false" />
+    </v-dialog>
   </v-app>
 </template>
 
 <script>
 import CellularAutomata from "./components/CellularAutomata";
+import ExplanationWhy from "./components/ExplanationWhy";
+
 export default {
   name: "App",
 
   components: {
-    CellularAutomata
+    CellularAutomata,
+    ExplanationWhy
   },
-  data: () => ({})
+  data: () => ({
+    explainingWhy: true
+  })
 };
 </script>
 
