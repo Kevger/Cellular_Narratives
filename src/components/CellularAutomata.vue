@@ -47,15 +47,15 @@
                     >Wild thinkers</v-subheader
                   >
                 </template>
-                <span
-                  >Defines the probability with which completely new narratives
-                  are created spontaneously.</span
-                >
+                <span>
+                  Defines the probability with which completely new narratives
+                  are created spontaneously.
+                </span>
               </v-tooltip>
               <v-slider
                 min="0"
-                max="0.05"
-                step="0.00001"
+                max="0.02"
+                step="0.000005"
                 v-model="newNarrativeChance"
               ></v-slider>
             </v-col>
@@ -66,10 +66,10 @@
                     >Skepticism</v-subheader
                   >
                 </template>
-                <span
-                  >Defines how sceptical the population is towards new
-                  narratives.</span
-                >
+                <span>
+                  Defines how sceptical the population is towards new
+                  narratives.
+                </span>
               </v-tooltip>
               <v-slider
                 min="0"
@@ -85,16 +85,16 @@
                     >Pluralism</v-subheader
                   >
                 </template>
-                <span
-                  >Defines how open the population is towards new narratives and
+                <span>
+                  Defines how open the population is towards new narratives and
                   how much they are willing to integrate them into their world
-                  view.</span
-                >
+                  view.
+                </span>
               </v-tooltip>
               <v-slider
                 min="0"
-                max="1"
-                step="0.0001"
+                max="0.5"
+                step="0.00001"
                 v-model="chanceToMix"
               ></v-slider>
             </v-col>
@@ -107,10 +107,9 @@
                     >Evolution chance</v-subheader
                   >
                 </template>
-                <span
-                  >Determines the probability of the narrative gradualy
-                  evolving.</span
-                >
+                <span>
+                  Determines the probability of the narrative gradualy evolving.
+                </span>
               </v-tooltip>
               <v-slider
                 min="0"
@@ -126,14 +125,14 @@
                     >Evolution strength</v-subheader
                   >
                 </template>
-                <span
-                  >Determines the intensity of the gradual development of the
-                  narratives.</span
-                >
+                <span>
+                  Determines the intensity of the gradual development of the
+                  narratives.
+                </span>
               </v-tooltip>
               <v-slider
                 min="0"
-                max="255"
+                max="128"
                 step="1"
                 v-model="mutationStrength"
               ></v-slider>
@@ -145,10 +144,10 @@
                     >Influencer</v-subheader
                   >
                 </template>
-                <span
-                  >Determines the probability that Super Spreader, highly
-                  infectious narratives, will appear.</span
-                >
+                <span>
+                  Determines the probability that Super Spreader, highly
+                  infectious narratives, will appear.
+                </span>
               </v-tooltip>
               <v-slider
                 min="0"
@@ -160,25 +159,15 @@
           </v-row>
           <v-row no-gutters>
             <v-card-actions>
-              <v-tooltip bottom>
-                <template v-slot:activator="{ on, attrs }">
-                  <v-btn
-                    v-bind="attrs"
-                    v-on="on"
-                    v-model="wrap"
-                    :color="wrap ? 'secondary' : 'primary'"
-                    value="false"
-                    @click="wrap = !wrap"
-                    hide-details
-                  >
-                    <v-icon>mdi-chart-donut</v-icon>Torus
-                  </v-btn>
-                </template>
-                <span
-                  >The world becomes a torus, up-down and left-right are
-                  smoothly connected.</span
-                >
-              </v-tooltip>
+              <v-btn
+                v-model="wrap"
+                :color="wrap ? 'secondary' : 'primary'"
+                value="false"
+                @click="wrap = !wrap"
+                hide-details
+              >
+                <v-icon>mdi-chart-donut</v-icon>Torus
+              </v-btn>
 
               <v-btn
                 v-model="isRunning"
@@ -195,16 +184,16 @@
         </v-container>
       </v-card>
     </v-menu>
-    <v-snackbar
+    <v-card
       left
-      color="rgb(0,0,0,0.3)"
-      style="padding:0%; position:absolute; left:1%; bottom:2%"
-      v-model="activeHighlighted"
-      :multi-line="false"
-      :timeout="10000"
+      color="rgb(0,0,0,0.4)"
+      style="padding:1%; position:absolute; left:1%; bottom:2%"
+      v-if="activeHighlighted"
     >
-      "{{ highlightedNarrative }}"
-    </v-snackbar>
+      <div v-if="activeHighlighted" style="white-space: nowrap; color:white;">
+        "{{ highlightedNarrative }}"
+      </div>
+    </v-card>
   </div>
 </template>
 
@@ -212,11 +201,8 @@
 import CAWorld from "../plugins/cellauto.js";
 import {
   nounList,
-  adverbList,
   adjectiveList,
-  prepositionList,
-  compoundWordList,
-  verbList
+  adverbList
 } from "../plugins/arrayToSentence.js";
 
 export default {
@@ -236,7 +222,9 @@ export default {
     innerWidth: window.innerWidth,
     _debounceTimer: null,
     highlightedNarrative: "Cellular Narratives",
-    activeHighlighted: false
+    activeHighlighted: false,
+    activeHighlightedTimer: null,
+    activeHighlightedTimeout: 10000
   }),
 
   mounted: function() {
@@ -316,7 +304,7 @@ export default {
             this.stability *= this.newnessLoss;
             if (Math.random() > this.stability || Math.random() < 0.0001) {
               if (
-                Math.random() < 0.1 &&
+                Math.random() < 0.01 &&
                 Math.random() < options.newNarrativeChance
               ) {
                 this.contagions = Math.random();
@@ -487,7 +475,6 @@ export default {
       myCanvas.addEventListener(
         "mousedown",
         function(evt) {
-          context.activeHighlighted = true;
           const mousePos = {
             x: evt.clientX - rect.left,
             y: evt.clientY - rect.top
@@ -496,41 +483,28 @@ export default {
             x: Math.floor(mousePos.x / context.cellSize),
             y: Math.floor(mousePos.y / context.cellSize)
           };
-          //   const message =
-          //     "Mouse position: " +
-          //     mousePos.x +
-          //     "," +
-          //     mousePos.y +
-          //     "\tCell position: " +
-          //     cellPos.x +
-          //     "," +
-          //     cellPos.y;
-          //   console.log(message);
           const type = context.CA.grid[cellPos.y][cellPos.x].type;
-          const noun = nounList[Math.floor(type[0])];
-          const adverb = adverbList[Math.floor(type[1])];
-          const adjective0 = adjectiveList[Math.floor(type[2])];
+          const adjective0 = adjectiveList[Math.floor(type[2] / 8)];
+          const noun = nounList[Math.floor(type[0] / 8)];
+          const adverb = adverbList[Math.floor(type[1] / 8)];
           const adjective1 =
-            adjectiveList[Math.floor(type[2] + randSeed) % 256];
-          const verb = verbList[Math.floor(type[2])];
-          const preposition = prepositionList[Math.floor(type[0])];
-          const compoundWord = compoundWordList[Math.floor(type[1])];
+            adjectiveList[Math.floor(((type[2] + randSeed) % 256) / 8)];
 
           context.highlightedNarrative =
             "The " +
             adjective0 +
             " " +
             noun +
-            " " +
+            " is " +
             adverb +
             " " +
-            verb +
-            " " +
-            preposition +
-            " " +
-            adjective1 +
-            " " +
-            compoundWord;
+            adjective1;
+
+          clearTimeout(context.activeHighlightedTimer);
+          context.activeHighlighted = true;
+          context.activeHighlightedTimer = setTimeout(() => {
+            context.activeHighlighted = false;
+          }, context.activeHighlightedTimeout);
         },
         false
       );
