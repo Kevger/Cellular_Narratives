@@ -12,3 +12,5 @@ https://cellular-narratives.web.app/
 
 ### Technical
 Created with vue.js, vuetify and parts of cellauto.js.
+
+![Example Picture](Example_Screenshot2.png)
