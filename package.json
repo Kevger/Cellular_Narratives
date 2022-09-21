@@ -13,7 +13,7 @@
     "register-service-worker": "^1.7.1",
     "roboto-fontface": "^0.10.0",
     "vue": "^2.6.11",
-    "vuetify": "^2.2.11"
+    "vuetify": "^2.6.10"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "~4.4.0",
